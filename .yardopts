@@ -1,0 +1,1 @@
+--markup markdown --no-private --protected lib/**/*.rb lib/bing_maps.rb - README.md
