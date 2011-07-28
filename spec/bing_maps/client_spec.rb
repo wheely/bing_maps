@@ -1,3 +1,4 @@
+# encoding: utf-8
 require 'spec_helper'
 
 describe BingMaps::Client do
@@ -16,4 +17,17 @@ describe BingMaps::Client do
     }
     result.class.should == Array
   end
+  
+  it "should perform a query request" do
+    result = nil
+    EM.run {
+      @client.callback do |locations|
+        result = locations
+        EM.stop
+      end
+      @client.query('Bahnhofstrasse, Zurich')
+    }
+    result.class.should == Array
+  end
+  
 end

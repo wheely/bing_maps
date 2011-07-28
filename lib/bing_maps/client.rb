@@ -20,7 +20,13 @@ module BingMaps
       request("/Locations/#{ll}", :query => {:key => @key})
     end
     
-    def query
+    # Gets a list of locations based on a query
+    # @param [String] q A string that contains information about a location
+    # @param [Hash] options Options
+    # @param options [String] :c Use the culture parameter to specify a culture for your request
+    # @param options [String] :userLocation The user's current position
+    def query(q, options={})
+      request("/Locations", :query => {:key => @key, :q => q}.merge(options))
     end
     
     def request(url, opts)
@@ -30,6 +36,7 @@ module BingMaps
          parsed = Yajl::Parser.parse(http.response)
          resources = parsed['resourceSets'][0]['resources']
          locations = resources.map{|data| BingMaps::Location.new(data)}
+         puts locations.inspect
          #parsed["response"]["groups"].each{|group| venues += group["items"]}
          succeed locations
        end
