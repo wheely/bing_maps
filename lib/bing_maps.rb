@@ -1,5 +1,6 @@
 require 'em-http-request'
-require 'yajl-ruby/json_gem'
+require 'em-synchrony/em-http'
+require 'yajl/json_gem'
 
 module BingMaps
   def self.new(options={})
