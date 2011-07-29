@@ -30,15 +30,19 @@ module BingMaps
     end
     
     def request(url, opts)
-       http = http_request(url, opts)
-       http.errback { fail }
-       http.callback do
-         parsed = Yajl::Parser.parse(http.response)
-         resources = parsed['resourceSets'][0]['resources']
-         locations = resources.map{|data| BingMaps::Location.new(data)}
-         puts locations.inspect
-         #parsed["response"]["groups"].each{|group| venues += group["items"]}
-         succeed locations
+      http = http_request(url, opts)
+      http.errback { fail(Exception.new("An error occured in the HTTP request: #{http.errors}")) }
+      http.callback do
+        begin
+          parsed = Yajl::Parser.parse(http.response)
+          resources = parsed['resourceSets'][0]['resources']
+          locations = resources.map{|data| BingMaps::Location.new(data)}
+          #puts locations.inspect
+          #parsed["response"]["groups"].each{|group| venues += group["items"]}
+          succeed locations
+        rescue Exception => e
+          fail(e)
+        end
        end
        http
      end
