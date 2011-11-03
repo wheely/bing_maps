@@ -1,7 +1,7 @@
 module BingMaps
   class Client
     include EventMachine::Deferrable
-    
+
     # Create a new BingMaps client
     #
     # @param [Hash] options Options
@@ -11,7 +11,7 @@ module BingMaps
       @key = options[:key]
       self
     end
-    
+
     # Get an address for a specified point (latitude and longitude)
     # @param [String] ll Latitude and longitude
     # @param [Hash] options Options
@@ -19,16 +19,16 @@ module BingMaps
     def reverse_geocode(ll, options={})
       request("/Locations/#{ll}", :query => {:key => @key})
     end
-    
+
     # Gets a list of locations based on a query
     # @param [String] q A string that contains information about a location
     # @param [Hash] options Options
     # @param options [String] :c Use the culture parameter to specify a culture for your request
     # @param options [String] :userLocation The user's current position
     def query(q, options={})
-      request("/Locations", :query => {:key => @key, :q => q}.merge(options))
+      request("/Locations", :query => {:key => @key, :addressLine => q}.merge(options))
     end
-    
+
     def request(url, opts)
       http = http_request(url, opts)
       http.errback { fail(Exception.new("An error occured in the HTTP request: #{http.errors}")) }
@@ -50,6 +50,6 @@ module BingMaps
      def http_request(url, opts)
        EventMachine::HttpRequest.new(@base_uri + url).aget(opts)
      end
-    
+
   end
 end
