@@ -35,8 +35,14 @@ module BingMaps
       http.callback do
         begin
           parsed = Yajl::Parser.parse(http.response)
-          resources = parsed['resourceSets'][0]['resources']
-          locations = resources.map{|data| BingMaps::Location.new(data)}
+          if parsed['resourceSets'] &&
+             parsed['resourceSets'][0] &&
+             parsed['resourceSets'][0]['resources']
+            resources = parsed['resourceSets'][0]['resources']
+            locations = resources.map{|data| BingMaps::Location.new(data)}
+          else
+            locations = []
+          end
           #puts locations.inspect
           #parsed["response"]["groups"].each{|group| venues += group["items"]}
           succeed locations
