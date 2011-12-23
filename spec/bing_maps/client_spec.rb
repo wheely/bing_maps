@@ -39,7 +39,7 @@ describe BingMaps::Client do
           result = locations
           EM.stop
         end
-        bing_maps.errback  {|e| pp e}
+        bing_maps.errback  {|e| puts e.message; pp e}
 
         bing_maps.query_with_geocoding("Tièchestrasse 9", "47.367347,8.550003") do |q, locations|
           location = locations.first
