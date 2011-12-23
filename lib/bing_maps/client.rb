@@ -16,8 +16,8 @@ module BingMaps
     # @param [String] ll Latitude and longitude
     # @param [Hash] options Options
     # @option options [String] :c The culture to use for the request
-    def reverse_geocode(ll, options={})
-      request("/Locations/#{ll}", :query => {:key => @key})
+    def reverse_geocode(ll, options={}, async = true)
+      request("/Locations/#{ll}", {:query => {:key => @key}}, async)
     end
 
     # Gets a list of locations based on a query
@@ -25,12 +25,12 @@ module BingMaps
     # @param [Hash] options Options
     # @param options [String] :c Use the culture parameter to specify a culture for your request
     # @param options [String] :userLocation The user's current position
-    def query(q, options={})
-      request("/Locations", :query => {:key => @key, :addressLine => q}.merge(options))
+    def query(q, options={}, async = true)
+      request("/Locations", {:query => {:key => @key, :addressLine => q}.merge(options)}, async)
     end
 
-    def request(url, opts)
-      http = http_request(url, opts)
+    def request(url, opts, async)
+      http = http_request(url, opts, async)
       http.errback { fail(Exception.new("An error occured in the HTTP request: #{http.errors}")) }
       http.callback do
         begin
@@ -56,8 +56,12 @@ module BingMaps
       http
     end
 
-    def http_request(url, opts)
-      EventMachine::HttpRequest.new(@base_uri + url).aget(opts)
+    def http_request(url, opts, async)
+      if async
+        EventMachine::HttpRequest.new(@base_uri + url).aget(opts)
+      else
+        EventMachine::HttpRequest.new(@base_uri + url).get(opts)
+      end
     end
   end
 end
