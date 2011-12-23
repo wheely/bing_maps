@@ -29,13 +29,6 @@ module BingMaps
       request("/Locations", :query => {:key => @key, :addressLine => q}.merge(options))
     end
 
-    def query_with_geocoding(q, ll)
-      EM::Synchrony.sync(request("/Locations/#{ll}", :query => {:key => @key}) do |locations|
-        q, options = yield q, locations
-        request("/Locations", {:query => {:key => @key, :addressLine => q}.merge(options)})
-      end)
-    end
-
     def request(url, opts)
       http = http_request(url, opts)
       http.errback { fail(Exception.new("An error occured in the HTTP request: #{http.errors}")) }
