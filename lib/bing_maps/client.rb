@@ -32,12 +32,12 @@ module BingMaps
     def query_with_geocoding(q, ll)
       request("/Locations/#{ll}", :query => {:key => @key}) do |locations|
         q, options = yield q, locations
-        request("/Locations", {:query => {:key => @key, :addressLine => q}.merge(options)})
+        request("/Locations", {:query => {:key => @key, :addressLine => q}.merge(options)}, false)
       end
     end
 
-    def request(url, opts)
-      http = http_request(url, opts)
+    def request(url, opts, async = true)
+      http = http_request(url, opts, async)
       http.errback { fail(Exception.new("An error occured in the HTTP request: #{http.errors}")) }
       http.callback do
         begin
@@ -63,8 +63,12 @@ module BingMaps
       http
     end
 
-    def http_request(url, opts)
-      EventMachine::HttpRequest.new(@base_uri + url).aget(opts)
+    def http_request(url, opts, async)
+      if async
+        EventMachine::HttpRequest.new(@base_uri + url).aget(opts)
+      else
+        EventMachine::HttpRequest.new(@base_uri + url).get(opts)
+      end
     end
   end
 end
